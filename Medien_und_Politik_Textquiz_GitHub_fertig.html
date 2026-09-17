@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Medien und Politik – Textquiz</title>
+<style>
+body{font-family:Arial,sans-serif;background:#f3f5f7;color:#20252b;margin:0}
+.wrap{max-width:850px;margin:auto;padding:25px 16px 45px}
+header,.card{background:white;border-radius:18px;padding:25px;box-shadow:0 4px 18px #00000012}
+header{background:#263746;color:white;margin-bottom:16px}
+h1{margin:0 0 6px}.muted{opacity:.85}.meta{color:#66727d;margin-bottom:12px}
+.progress{height:9px;background:#dce2e7;border-radius:10px;margin:18px 0}.bar{height:100%;width:0;background:#527d99;border-radius:10px}
+.answers{display:grid;gap:11px}.answer{padding:15px;border:2px solid #d9e0e5;border-radius:11px;background:white;text-align:left;font-size:16px;cursor:pointer}
+.answer:hover:not(:disabled){background:#f2f7fa;border-color:#527d99}.answer:disabled{cursor:default}
+.correct{background:#e9f5ed!important;border-color:#4b8061!important}.wrong{background:#faeded!important;border-color:#b85c5c!important}
+.feedback{display:none;margin-top:18px;padding:15px;border-radius:11px;line-height:1.5}.show{display:block}.good{background:#e9f5ed;border-left:5px solid #4b8061}.bad{background:#faeded;border-left:5px solid #b85c5c}
+.next,.restart{display:none;margin-top:17px;padding:12px 19px;border:0;border-radius:9px;background:#263746;color:white;font-size:16px;cursor:pointer}.next.show,.restart.show{display:inline-block}
+.result{text-align:center;display:none}.result.show{display:block}.score{font-size:52px;font-weight:bold;color:#263746;margin:12px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header><h1>Medien und Politik</h1><div class="muted">Textquiz: „Abhängigkeit Medien – Politik“</div></header>
+<div id="quiz">
+<div class="progress"><div id="bar" class="bar"></div></div>
+<div class="card">
+<div id="meta" class="meta"></div><h2 id="question"></h2>
+<div id="answers" class="answers"></div>
+<div id="feedback" class="feedback"></div>
+<button id="next" class="next">Nächste Frage →</button>
+</div></div>
+<div id="result" class="card result">
+<h2>Geschafft!</h2><div id="score" class="score"></div><p id="resultText"></p>
+<button class="restart show" onclick="restartQuiz()">Quiz noch einmal starten</button>
+</div>
+</div>
+<script>
+const qs = [
+  ["Warum werden moderne demokratische Gesellschaften teilweise als „Mediendemokratien“ bezeichnet?",
+   ["Weil politische Kommunikation sich zu einem großen Teil über Medien vollzieht.",
+    "Weil Medien die politischen Institutionen vollständig ersetzt haben.",
+    "Weil Bürgerinnen und Bürger politische Entscheidungen direkt über Medien treffen.",
+    "Weil politische Parteien inzwischen Teil der Medienunternehmen sind."],
+   0, "Der Text betont, dass politische Kommunikation in modernen Gesellschaften vor allem über Medien vermittelt wird."],
+
+  ["Warum muss Politik in einer Demokratie mit den Bürgerinnen und Bürgern kommunizieren?",
+   ["Weil politische Entscheidungen auf die Unterstützung der Bürgerinnen und Bürger und damit auf Legitimation angewiesen sind.",
+    "Weil Bürgerinnen und Bürger jede politische Entscheidung selbst formulieren müssen.",
+    "Weil Medien gesetzlich verpflichtet sind, politische Entscheidungen zu bestätigen.",
+    "Weil ohne Medien keine politischen Entscheidungen getroffen werden dürfen."],
+   0, "Der Text verbindet Kommunikation mit der Unterstützung der Bürgerinnen und Bürger und der Legitimation politischer Entscheidungen."],
+
+  ["Warum ist die Aufmerksamkeit des Publikums laut Text ein „knappes Gut“?",
+   ["Weil viele Akteure mit ihren Botschaften um die Aufmerksamkeit von Medien und Öffentlichkeit konkurrieren.",
+    "Weil es heute nur noch wenige Medienangebote gibt.",
+    "Weil politische Informationen nur zu bestimmten Zeiten veröffentlicht werden dürfen.",
+    "Weil Bürgerinnen und Bürger grundsätzlich wenig Interesse an Politik haben."],
+   0, "Der Text beschreibt ein großes Medienangebot und einen Wettbewerb verschiedener Akteure um begrenzte Aufmerksamkeit."],
+
+  ["Welche Folge kann die starke Ausrichtung der Politik auf Medien laut Text haben?",
+   ["Politische Akteure greifen verstärkt auf politische Inszenierung und mediengerechte Darstellung zurück.",
+    "Politische Akteure verzichten zunehmend auf Öffentlichkeitsarbeit.",
+    "Politische Entscheidungen werden vollständig von Journalistinnen und Journalisten getroffen.",
+    "Politische Sachverhalte werden grundsätzlich ausführlicher und komplexer dargestellt."],
+   0, "Der Text nennt politische Inszenierung als mögliche Folge der Ausrichtung auf mediale Bedingungen."],
+
+  ["Welche Grundannahme kennzeichnet die Dependenzthese?",
+   ["Die Medien haben gegenüber der Politik die Oberhand.",
+    "Die Politik hat gegenüber den Medien die Oberhand.",
+    "Politik und Medien sind vollständig unabhängig voneinander.",
+    "Politik und Medien haben grundsätzlich dieselben Interessen."],
+   0, "Die Dependenzthese beschreibt Politik als zunehmend von den Medien abhängig und Medien als eigene Macht."],
+
+  ["Was besagt die Instrumentalisierungsthese?",
+   ["Politische Akteure versuchen, Medien für ihre eigenen Zwecke zu nutzen.",
+    "Medien bestimmen zunehmend selbst die politischen Entscheidungen.",
+    "Medien und Politik beeinflussen sich grundsätzlich gleich stark.",
+    "Politische Akteure verzichten auf Medien, um unabhängig zu bleiben."],
+   0, "Die Instrumentalisierungsthese geht von einer Übermacht der Politik aus: Medien können für politische Zwecke eingesetzt werden."],
+
+  ["Was ist das zentrale Merkmal des Interdependenzparadigmas?",
+   ["Politik und Medien sind wechselseitig voneinander abhängig.",
+    "Die Medien haben grundsätzlich mehr Macht als die Politik.",
+    "Die Politik kontrolliert grundsätzlich die Medien.",
+    "Politik und Medien arbeiten unabhängig voneinander."],
+   0, "Die Interdependenzthese nimmt keine eindeutige Übermacht an, sondern komplexe Wechselwirkungen und gegenseitige Abhängigkeiten."],
+
+  ["Welche Situation veranschaulicht am deutlichsten die Interdependenzthese?",
+   ["Politik braucht Medien für die Darstellung ihrer Themen, während Medien Informationen aus der Politik benötigen.",
+    "Eine Regierung entscheidet, welche Nachrichten veröffentlicht werden.",
+    "Ein Fernsehsender entscheidet über neue Gesetze.",
+    "Politische Akteure kommunizieren grundsätzlich ohne Medien."],
+   0, "Der Text nennt genau dieses gegenseitige Angewiesensein als Beispiel für Interdependenz."],
+
+  ["Warum kann die Konkurrenz um mediale Aufmerksamkeit für politische Akteure problematisch sein?",
+   ["Weil politische Kommunikation dadurch stärker an mediale Bedingungen und Attraktivität angepasst werden kann.",
+    "Weil dadurch automatisch alle politischen Interessen gleich stark vertreten werden.",
+    "Weil Medien dadurch ihre gesamte politische Berichterstattung einstellen.",
+    "Weil politische Akteure dadurch keine Möglichkeit mehr zur Öffentlichkeitsarbeit haben."],
+   0, "Der Text beschreibt, dass Politik attraktiv und mediengerecht kommunizieren muss und dies Konsequenzen für den politischen Prozess haben kann."],
+
+  ["Welche Aussage fasst das Interdependenzparadigma am besten zusammen?",
+   ["Keine Seite ist grundsätzlich überlegen; beide benötigen die jeweils andere Seite und beeinflussen sich gegenseitig.",
+    "Die Medien bestimmen die Politik, weil sie die öffentliche Meinung vollständig kontrollieren.",
+    "Die Politik bestimmt die Medien, weil sie den Zugang zu allen Informationen kontrolliert.",
+    "Medien und Politik stehen unabhängig nebeneinander und beeinflussen sich kaum."],
+   0, "Die Interdependenzthese bildet die Mittelposition: weder Medien noch Politik werden als grundsätzlich übermächtig beschrieben."]
+];
+
+const meta = document.getElementById("meta");
+const question = document.getElementById("question");
+const answers = document.getElementById("answers");
+const feedback = document.getElementById("feedback");
+const next = document.getElementById("next");
+const bar = document.getElementById("bar");
+const quiz = document.getElementById("quiz");
+const result = document.getElementById("result");
+const scoreEl = document.getElementById("score");
+const resultText = document.getElementById("resultText");
+
+let n = 0;
+let score = 0;
+
+function show() {
+  const x = qs[n];
+  meta.textContent = `Frage ${n + 1} von ${qs.length}`;
+  question.textContent = x[0];
+  bar.style.width = ((n / qs.length) * 100) + "%";
+  answers.innerHTML = "";
+  feedback.className = "feedback";
+  feedback.innerHTML = "";
+  next.className = "next";
+
+  x[1].forEach((t, i) => {
+    const b = document.createElement("button");
+    b.className = "answer";
+    b.type = "button";
+    b.textContent = String.fromCharCode(65 + i) + ") " + t;
+    b.addEventListener("click", () => choose(i, b));
+    answers.appendChild(b);
+  });
+}
+
+function choose(i, b) {
+  const x = qs[n];
+  document.querySelectorAll(".answer").forEach(z => z.disabled = true);
+
+  if (i === x[2]) {
+    score++;
+    b.classList.add("correct");
+    feedback.className = "feedback show good";
+    feedback.innerHTML = "<b>✓ Richtig!</b><br>" + x[3];
+  } else {
+    b.classList.add("wrong");
+    document.querySelectorAll(".answer")[x[2]].classList.add("correct");
+    feedback.className = "feedback show bad";
+    feedback.innerHTML = "<b>✗ Nicht ganz.</b><br>" + x[3];
+  }
+
+  next.className = "next show";
+  next.textContent = n === qs.length - 1
+    ? "Auswertung anzeigen →"
+    : "Nächste Frage →";
+}
+
+next.addEventListener("click", () => {
+  n++;
+  if (n < qs.length) {
+    show();
+  } else {
+    finish();
+  }
+});
+
+function finish() {
+  quiz.style.display = "none";
+  result.className = "card result show";
+  scoreEl.textContent = score + " / " + qs.length;
+
+  if (score >= 9) {
+    resultText.textContent = "Sehr sicher! Die zentralen Aussagen des Textes sitzen.";
+  } else if (score >= 7) {
+    resultText.textContent = "Sehr gut! Die Grundgedanken sind weitgehend verstanden.";
+  } else {
+    resultText.textContent = "Lies besonders die drei Ansätze Dependenz, Instrumentalisierung und Interdependenz noch einmal.";
+  }
+}
+
+function restartQuiz() {
+  n = 0;
+  score = 0;
+  result.className = "card result";
+  quiz.style.display = "block";
+  show();
+}
+
+show();
+</script>
+</body></html>
